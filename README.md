@@ -1,54 +1,41 @@
-# lead-agent-workflow
+# agent-skills
 
-An agent skill that lets one lead agent run coding work through worker agents: from a request to
-merged pull requests. The lead builds a task graph, dispatches coders and reviewers, runs the
-review loop, gates merges on CI, and keeps its own context small.
+Agent skills for running coding work through AI agents: one to lead a team of workers from request
+to merged PR, and one to write the pull request. They work in Claude Code and any harness that
+reads `SKILL.md` skills.
 
-It is tool-neutral. Cards for Paseo, T3 Code and Claude Code
-are in `references/tools.md`; other tools fall back to a generic probe-and-adapt procedure.
+## Skills
 
-## What is in it
+| Skill | Say | What it does |
+| --- | --- | --- |
+| [`lead-agent-workflow`](skills/lead-agent-workflow) | "orchestrate agents to fix these issues", "dispatch coders and reviewers" | One lead agent builds a task graph, dispatches coders and reviewers, runs the review loop, gates merges on CI, and keeps its own context small. |
+| [`write-pr`](skills/write-pr) | "open a PR", "write the PR description" | Writes a short PR that leads with the problem, shows evidence, and states the merge risk. |
 
-| Path | Purpose |
-| --- | --- |
-| `SKILL.md` | The workflow: sizing, task states, seven steps, the lead loop, defaults |
-| `references/contracts.md` | Ledger, brief, report and finding formats |
-| `references/review.md` | Triage, fix rounds, re-checks, round cap |
-| `references/supervision.md` | Waiting, stuck workers, CI verdicts, quota, handover |
-| `references/tools.md` | Per-tool cards and the capabilities the skill needs |
-| `references/pitfalls.md` | Traps learned from real runs |
-| `scripts/pr-ci.sh` | One CI verdict for a PR's head commit (GitHub) |
+`lead-agent-workflow` tells its coders to write PRs with a PR-writing skill. `write-pr` is the one
+meant for that, but any other works.
 
 ## Install
 
-Copy or symlink the directory into your agent's skills folder, keeping the name
-`lead-agent-workflow`:
-
-```sh
-git clone https://github.com/duykhanh01/lead-agent-workflow ~/.claude/skills/lead-agent-workflow
+```bash
+git clone https://github.com/duykhanh01/agent-skills
+cp -R agent-skills/skills/* ~/.claude/skills/   # Claude Code
+cp -R agent-skills/skills/* ~/.agents/skills/   # other harnesses that read this folder
 ```
 
-Other agents that read `SKILL.md` skills (for example from `~/.agents/skills/`) work the same way.
+Copy only the folders you want. Each skill is self-contained.
 
 ## Requirements
 
-- An agent harness that can spawn, resume and wait on worker agents.
-- GitHub with the `gh` CLI (authenticated) and `jq` for `scripts/pr-ci.sh`. For another git host,
-  see "Git host" in `references/tools.md`.
+- An authenticated [GitHub CLI](https://cli.github.com) (`gh`) and `jq`.
+- `lead-agent-workflow` needs a harness that can spawn, resume and wait on worker agents. Cards for
+  Paseo, T3 Code and Claude Code are in its `references/tools.md`.
 
-## Use
+## Make them yours
 
-Ask explicitly, for example: "orchestrate agents to fix these five issues" or "dispatch coders and
-reviewers for this plan". The skill does not trigger for ordinary single-agent work.
+These are starting points. Edit them. Put personal settings, such as which models coders and
+reviewers use, in your `CLAUDE.md` or `AGENTS.md`, so you can update the skills without losing them.
 
-The defaults in `SKILL.md` (parallelism, models, merge style) are starting points; override them
-in your request or your repository's own rules.
+## Credits and license
 
-## Status
-
-The tool cards come from the author's own sessions. Items marked "Not verified" in
-`references/tools.md` were not tested; treat them as hypotheses and update the card when you do.
-
-## License
-
-MIT License. See [LICENSE](LICENSE).
+[MIT](LICENSE). `write-pr` builds on work by Matt Pocock, Theo Browne and HumanLayer; see
+[NOTICE.md](NOTICE.md).

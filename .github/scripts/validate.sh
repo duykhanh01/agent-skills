@@ -1,30 +1,37 @@
 #!/usr/bin/env bash
-# Structural checks for the skill: frontmatter, referenced files, and pr-ci.sh verdict logic.
+# Structural checks for every skill under skills/, plus pr-ci.sh verdict logic.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 fail=0
 err() { echo "error: $*" >&2; fail=1; }
 
-[[ $(sed -n 1p SKILL.md) == --- ]] || err "SKILL.md must start with frontmatter"
-name=$(sed -n '/^---$/,/^---$/p' SKILL.md | sed -n 's/^name: *//p')
-[[ $name == lead-agent-workflow ]] || err "frontmatter name is '$name'"
-sed -n '/^---$/,/^---$/p' SKILL.md | grep -q '^description:' || err "frontmatter lacks description"
+for dir in skills/*/; do
+  dir=${dir%/}; skill=${dir#skills/}
+  md=$dir/SKILL.md
+  [[ -f $md ]] || { err "$dir has no SKILL.md"; continue; }
+  [[ $(sed -n 1p "$md") == --- ]] || err "$md must start with frontmatter"
+  front=$(sed -n '2,/^---$/p' "$md")
+  [[ $(sed -n 's/^name: *//p' <<<"$front") == "$skill" ]] || err "$md: name must equal '$skill'"
+  grep -q '^description:' <<<"$front" || err "$md lacks a description"
 
-# Every references/ or scripts/ path mentioned anywhere must exist.
-while read -r path; do
-  [[ -e $path ]] || err "referenced path does not exist: $path"
-done < <(grep -rhoE '(references|scripts)/[A-Za-z0-9_.-]+\.(md|sh)' SKILL.md README.md references scripts | sort -u)
+  # Paths a skill mentions must exist; every bundled file must be mentioned.
+  while read -r path; do
+    [[ -e $dir/$path ]] || err "$md mentions missing $path"
+  done < <(grep -rhoE '(references|scripts)/[A-Za-z0-9_.-]+\.(md|sh)' "$dir" | sort -u)
+  for f in "$dir"/references/*.md "$dir"/scripts/*.sh; do
+    [[ -e $f ]] || continue
+    grep -q "${f#"$dir"/}" "$md" || err "$f is not mentioned in $md"
+  done
 
-# Every file in references/ and scripts/ must be reachable from SKILL.md or README.md.
-for f in references/*.md scripts/*.sh; do
-  grep -q "$f" SKILL.md README.md || err "$f is not mentioned in SKILL.md or README.md"
+  grep -q "\`$skill\`" README.md || err "README.md does not list $skill"
 done
 
 # pr-ci.sh classification, offline.
+ci=skills/lead-agent-workflow/scripts/pr-ci.sh
 check() {
   local want=$1 workflows=$2 json=$3 got
-  got=$(PR_CI_CLASSIFY_ONLY=$workflows bash scripts/pr-ci.sh 1 <<<"$json")
+  got=$(PR_CI_CLASSIFY_ONLY=$workflows bash "$ci" 1 <<<"$json")
   [[ $got == "$want"* ]] || err "classify($json) = '$got', want '$want'"
 }
 check NO_RUN  1 '[]'

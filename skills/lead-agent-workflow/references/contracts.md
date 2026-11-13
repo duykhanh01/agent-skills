@@ -74,7 +74,7 @@ Fix #42 (https://github.com/o/r/issues/42): `logs --follow` should stop when the
 human. Done = a test that follows a task into needs_input passes, and the command exits 0 there.
 Work in ../r.worktrees/fix/logs-follow-stop (from origin/main). I believe the stop signal already
 exists as a `needs_input` event; check before adding one. #57 owns the wake hook, so leave
-src/hooks/ alone. Draft PR following the repo's PR template (or a PR-writing skill, if installed); merge origin/main in before you report. Write the full
+src/hooks/ alone. Draft PR following the repo's PR template (or a PR-writing skill such as `write-pr`, if installed); merge origin/main in before you report. Write the full
 report to <run>/reports/logs-follow-stop.md and reply in the usual short shape.
 ```
 

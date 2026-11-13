@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate skill structure and pr-ci.sh logic
+      - name: Validate skills and pr-ci.sh logic
         run: .github/scripts/validate.sh
       - name: ShellCheck
-        run: shellcheck scripts/*.sh .github/scripts/*.sh
+        run: shellcheck skills/*/scripts/*.sh .github/scripts/*.sh
 
   secrets:
     runs-on: ubuntu-latest
