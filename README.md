@@ -51,4 +51,4 @@ The tool cards come from the author's own sessions. Items marked "Not verified" 
 
 ## License
 
-Apache License 2.0. See [LICENSE](LICENSE).
+MIT License. See [LICENSE](LICENSE).
