@@ -52,14 +52,8 @@ Where it bites:
   <worktree>` and reset its name, mode and effort with `update_agent`. A Codex reviewer cannot be
   imported this way; start a new one with a delta brief.
 - Not verified: whether sending a prompt to an archived agent revives it.
-- Paseo runs Codex from its own home, with its own `auth.json`. A copy that went stale fails with
-  "refresh token was revoked" even while `codex login status` reports logged in. A resumed agent
-  with broken auth does not recover; start a new one. Before the first Codex dispatch, send a
-  one-line prompt to test the login.
 - `create_agent` can be refused by the harness's auto-mode check; the same call again goes
   through. `list_agents` hides a lead's sub-agents; read them with `get_agent_status` by id.
-- A pull request left as a draft gets no CI run, and the verdict script reports DRAFT. Open it
-  ready, or accept that CI is not evidence.
 
 ## T3 Code
 

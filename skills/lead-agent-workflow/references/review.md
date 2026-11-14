@@ -54,9 +54,11 @@ A round is one fix by the coder plus one re-check by the reviewer.
   twice.
 - **Keep the PR the size of the goal.** Take the fix that deletes or narrows code over a new guard,
   helper or option. If review grew the diff, cut before the next round.
-- After each round, write the ledger: round number, what was addressed, what is open.
+- After each round, write the ledger: round number, what was addressed, what is open, and the
+  head SHA the reviewer last read.
 
-The cap is three rounds. A high-risk task may run rounds 4 and 5, on a stronger model.
+The cap is three rounds. A high-risk task may run rounds 4 and 5 on a stronger model, and a fresh
+review (below) may add two. No PR runs more than five.
 
 ## When the loop does not converge
 
@@ -88,16 +90,48 @@ silent discard.
 
 ## Same agent or a new one
 
-Resume the same agent when the work continues what it already knows: a coder fixing its own code, a
-reviewer checking its own findings. Start a new one when:
+The first review of any PR goes to an agent that has seen none of the coder's reasoning. After
+that, resume the same agents: the coder fixes its own code and the reviewer re-checks its own
+findings, whatever the size of the fix.
 
-1. **The coder is stuck:** three rounds have not cleared the blockers.
-2. **The fix changed the approach:** most of the PR was rewritten, or a rebase resolved conflicts
-   in a high-risk area. The old reviewer's picture is stale; give the result a first review again.
-3. **The old context is a burden:** it is very large, it went down a wrong path, or the tool cannot
-   resume.
+A new agent comes in two kinds, and they do different jobs.
 
-The first review of any PR always goes to an agent that has seen none of the coder's reasoning.
+**A replacement** continues a job the old agent cannot finish: the tool cannot resume it, its
+context is very large, or it went down a wrong path. A new coder also replaces one that three
+rounds have not unstuck. A replacement picks up where the old one stopped. A replacement coder
+reads the report file first; a replacement reviewer gets the open findings and the fix range and
+does the narrow re-check, not a new review.
+
+**A fresh review** reads the whole diff again. Whether a fix is "significant" is a call the lead
+makes badly, so start one only on a trigger you can check:
+
+1. **A ruling changed a decision the PR is built on,** after its first review. The ledger shows it.
+2. **The fixes rewrote much of the PR:** the lines changed by the fix commits
+   (`git log --no-merges --shortstat <reviewed-sha>..HEAD`) are more than half of the lines in the
+   PR's diff at the reviewed SHA.
+
+Below these, the old reviewer's narrow re-check is the check, however large the coder calls the
+fix.
+
+Bound it so it cannot restart the loop:
+
+- **One per PR,** after the first review. A second trigger means the task is unstable: re-plan it,
+  or mark it `blocked` and ask the user. Do not review it a third time.
+- **Brief it with the settled list.** The first-review brief, plus a short list from the ledger:
+  each earlier finding as its id, one line and its route, and each ruling that touches the PR.
+  These are settled. It does not raise them again; if it thinks a ruling is wrong, it says so in
+  one line with evidence the ledger does not have, outside its findings. Give it neither the
+  coder's report nor the earlier reviewer's reasoning. The list keeps it off old ground; the
+  missing reasoning keeps its view independent.
+- **It takes over the re-checks.** The fresh reviewer is resumed for every later round and the old
+  one is done. A fresh review is never re-checked by another fresh review.
+- **The count does not reset.** At most two rounds follow it, five in all; then rule at the cap.
+  Triage its findings as usual, and reject one that repeats a settled point by citing the ruling.
+
+There is no routine fresh review before merge. A new reviewer reading the whole diff nearly always
+finds something the first did not, so a fresh review at the end of every PR restarts a loop that
+had converged. The first review was already independent, and CI and the narrow re-checks cover the
+fixes. On an integration branch the whole-branch review below is the fresh look.
 
 ## After a conflict
 

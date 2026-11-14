@@ -124,6 +124,8 @@ Send the delta, never the history.
   the finding is wrong, and to reply with the commit SHA and one line per finding.
 - **Re-check to the reviewer:** what changed for each finding it raised, the fix range, and one
   question: did the fix break anything in the lines it touched?
+- **Fresh review:** the first-review brief plus the settled list of findings and rulings
+  (`review.md`, "Same agent or a new one").
 - **Rebase:** which merge caused the conflict and which side wins where they overlap. The coder
   pushes with `--force-with-lease`.
 

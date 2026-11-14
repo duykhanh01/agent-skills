@@ -33,9 +33,6 @@ the reviewer a rule. When an entry becomes a workflow rule or a tool card line, 
 
 ## Ownership
 
-- **When a repo skill has the same name as an installed one, keep the repo's.** Install only what
-  the repo lacks.
-
 - **Another system's branches and other people's PRs stay theirs.** Port the work to your own
   branch, keep the original commits and credit, and link the source PR.
 - **Closing or replacing an issue can leave the spec stale.** Have a cheap agent send a docs PR, or

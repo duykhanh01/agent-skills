@@ -227,7 +227,7 @@ the safe path: leave the PR open and put the question first in your report.
 ## Staying cheap
 
 - Resume a worker for work that continues what it knows; its cache and its reasons carry over.
-  `references/review.md` lists the three cases where a new agent is better.
+  `references/review.md` says when a new agent is better, and bounds the fresh review.
 - Name an installed skill (a review skill, a PR-writing skill) in place of a checklist.
 - Read summaries: PR metadata, agent status, the last lines of activity. Read a diff hunk only to
   settle a dispute.
