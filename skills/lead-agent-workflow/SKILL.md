@@ -73,7 +73,9 @@ Open a run directory and its ledger (`references/contracts.md`), then record:
 - the goal in the user's words, and where the work comes from (tickets, a plan, a list);
 - the **grant**: `merge` or `stop-at-ready`, and what you may decide alone (reviewer and model
   choice, task order, model escalation);
-- whether the user wants a planning pass, how many coders may run at once, which models.
+- whether the user wants a planning pass, how many coders may run at once, which models, and which
+  provider profiles are allowed when a model is offered by more than one;
+- when the repo's rules say the user merges, whether the grant `merge` still holds for this run.
 
 Ask only what would change what you do, in one batch, with the harness's question tool. Take the
 rest from "Defaults" and say what you chose.

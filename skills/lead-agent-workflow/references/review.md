@@ -31,6 +31,15 @@ Judge each finding on its own evidence:
 Anything that weakens a test or a CI gate goes to the user, whatever the route: removed or skipped
 tests, loosened assertions, raised thresholds, regenerated snapshots.
 
+## Reviewer sub-agents
+
+A review skill may spawn sub-agents (for example one for standards and one for the spec). The
+**reviewer** spawns them, not you: splitting the axes yourself pulls the reviewer's context into
+yours. Name the skill in the brief, allow sub-agents explicitly, and ask the reviewer to say how it
+ran. If it cannot spawn them it does the axes one after the other. Do not replace the repo's
+review skill with a checklist of your own; a first round written that way skipped the skill and
+had to be redone.
+
 ## Fix rounds
 
 A round is one fix by the coder plus one re-check by the reviewer.

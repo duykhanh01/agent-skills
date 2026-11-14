@@ -23,7 +23,18 @@ the reviewer a rule. When an entry becomes a workflow rule or a tool card line, 
 - **`--admin` merges a branch that is behind the base without updating it,** so run the
   behind-the-base check in `supervision.md` first.
 
+- **Search for an existing issue before opening one.** A flaky test got a duplicate issue; it was
+  closed and its evidence moved to the first.
+- **A known flake that keeps reddening CI is worth a small task.** Measure it before and after
+  (20 runs each), forbid weakening the test, and rerun only the failed job meanwhile. Never merge
+  on red.
+- **When two PRs touch the same files, tell the coder to merge the base before it pushes a fix.**
+  A fix pushed on a stale branch left the PR conflicting for another round.
+
 ## Ownership
+
+- **When a repo skill has the same name as an installed one, keep the repo's.** Install only what
+  the repo lacks.
 
 - **Another system's branches and other people's PRs stay theirs.** Port the work to your own
   branch, keep the original commits and credit, and link the source PR.
