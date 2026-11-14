@@ -143,8 +143,8 @@ Risk decides the review:
 - **High** (state, concurrency, persistence, security, migrations): the strongest reviewer you
   have.
 
-When a review comes back, follow `references/review.md`: triage, fix rounds, re-checks, the round
-cap, and what to do when the loop does not converge.
+When a review comes back, follow `references/review.md`: triage, fix rounds, re-checks, and what
+to do when the loop does not converge.
 
 *Done when no blocking finding is open and every other finding is fixed, deferred or rejected with
 a ruling.*

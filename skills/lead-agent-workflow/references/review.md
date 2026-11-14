@@ -44,7 +44,7 @@ had to be redone.
 
 A round is one fix by the coder plus one re-check by the reviewer.
 
-- **Rounds 1–3: the same coder and the same reviewer,** both resumed. The coder knows the task and
+- **The same coder and the same reviewer,** both resumed. The coder knows the task and
   its own reasons; the reviewer knows its own findings.
 - **The re-check is narrow.** For each open finding the reviewer answers ADDRESSED or NOT
   ADDRESSED, and it looks for breakage only in the lines the fix touched. Anything new outside
@@ -57,36 +57,36 @@ A round is one fix by the coder plus one re-check by the reviewer.
 - After each round, write the ledger: round number, what was addressed, what is open, and the
   head SHA the reviewer last read.
 
-The cap is three rounds. A high-risk task may run rounds 4 and 5 on a stronger model, and a fresh
-review (below) may add two. No PR runs more than five.
+There is no round limit. The loop ends when no blocking finding is open; a loop that stops
+converging gets a diagnosis, not a cap.
 
 ## When the loop does not converge
 
-If the same finding survives two rounds, or round three ends with a blocker open, find the cause
-before sending another round:
+If the same finding survives two rounds, or each round opens as many blockers as it closes, find
+the cause before sending another round:
 
 - **One root decision keeps producing findings.** Group the findings by the decision they come
   from, settle that decision, then fix.
 - **The brief or the spec is unclear,** or coder and reviewer read it differently. Settle it with a
   ruling, or re-brief.
 - **The reviewer raises new nits each round.** Look at what truly blocks, defer the rest, move on.
-- **The coder cannot see its own problem.** On a high-risk task, and if the user allows
-  escalation, rounds 4 and 5 go to a stronger model: change the model on the same agent where the
-  tool can, otherwise start a new coder that reads the report file first. On other tasks, rule at
-  the cap.
+- **The coder cannot see its own problem.** If the user allows escalation, move it to a stronger
+  model: change the model on the same agent where the tool can, otherwise start a new coder that
+  reads the report file first.
 - **The cause is outside the code:** a broken environment or toolchain, missing access, flaky
   infrastructure, or a decision only the user can make. Mark the task `blocked`, leave the PR open,
   record the evidence, and carry on with the other tasks.
 
-At the cap, stop dispatching and rule on each open finding yourself:
+When the cause is a dispute rather than a fix the coder can make, rule on the open finding
+yourself instead of sending another round:
 
 - the reviewer is wrong, or the point is contestable: reject it, with the reason;
 - real, and nothing downstream builds on it: defer it;
 - real and load-bearing: rule on the smallest change that unblocks dependent work, or mark the task
   `blocked`.
 
-Rule on findings only at triage or at the cap. Dropping one mid-loop to end the loop sooner is a
-silent discard.
+Rule on findings only at triage or after such a diagnosis. Dropping one mid-loop to end the loop
+sooner is a silent discard.
 
 ## Same agent or a new one
 
@@ -97,8 +97,8 @@ findings, whatever the size of the fix.
 A new agent comes in two kinds, and they do different jobs.
 
 **A replacement** continues a job the old agent cannot finish: the tool cannot resume it, its
-context is very large, or it went down a wrong path. A new coder also replaces one that three
-rounds have not unstuck. A replacement picks up where the old one stopped. A replacement coder
+context is very large, or it went down a wrong path. A new coder also replaces one that is stuck
+(see above). A replacement picks up where the old one stopped. A replacement coder
 reads the report file first; a replacement reviewer gets the open findings and the fix range and
 does the narrow re-check, not a new review.
 
@@ -123,8 +123,8 @@ Bound it so it cannot restart the loop:
   missing reasoning keeps its view independent.
 - **It takes over the re-checks.** The fresh reviewer is resumed for every later round and the old
   one is done. A fresh review is never re-checked by another fresh review.
-- **The count does not reset.** At most two rounds follow it, five in all; then rule at the cap.
-  Triage its findings as usual, and reject one that repeats a settled point by citing the ruling.
+- **Triage its findings as usual,** and reject one that repeats a settled point by citing the
+  ruling.
 
 There is no routine fresh review before merge. A new reviewer reading the whole diff nearly always
 finds something the first did not, so a fresh review at the end of every PR restarts a loop that

@@ -30,7 +30,7 @@ Workers: coders=<n> · coder=<model/effort> · reviewer=<model/effort> · tool=<
 
 | Task | State | Owner | Branch / PR | Round | Wake | Next |
 | --- | --- | --- | --- | --- | --- | --- |
-| logs-follow-stop | reviewing | coder a1f3 · reviewer 9c2e | fix/logs-follow-stop · #291 | 1/3 | reviewer finish notice | triage findings |
+| logs-follow-stop | reviewing | coder a1f3 · reviewer 9c2e | fix/logs-follow-stop · #291 | 1 | reviewer finish notice | triage findings |
 
 ## Rulings
 - R1: <what you decided> — <why> — <cost if wrong>
