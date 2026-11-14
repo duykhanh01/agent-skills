@@ -76,8 +76,9 @@ This skill replaces three lines of T3's orchestration instructions:
   each child's `childThreadId` in the ledger's Owner column. Send only after the child's completion
   has woken you; a send to a running child steers its current turn.
 - T3 says to fix small review findings yourself. Under this skill the owning coder fixes them.
-- T3 says never to switch a model unasked. Under this skill moving a stuck task to a stronger model
-  is the lead's call, within the `providerInstanceId`s allowed at Intake; record it as a ruling.
+- T3 says never to switch a model unasked. The Intake question on escalation is that ask: with a
+  yes, move a stuck task to one of the models the user named, within the allowed
+  `providerInstanceId`s, without asking again. Without a yes, never switch.
 
 Where it bites:
 

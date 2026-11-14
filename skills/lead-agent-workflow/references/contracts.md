@@ -25,7 +25,7 @@ all worktrees of the repo share and git never cleans.
 # Ledger — <goal in one line> — <date>
 
 Source: <tickets | plan path | user's list>
-Grant: merge | stop-at-ready · may decide: <reviewer, models, order>
+Grant: merge | stop-at-ready · may decide: <reviewer, models, order, escalation to <models>>
 Workers: coders=<n> · coder=<model/effort> · reviewer=<model/effort> · tool=<name>
 
 | Task | State | Owner | Branch / PR | Round | Wake | Next |
