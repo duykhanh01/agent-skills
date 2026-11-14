@@ -25,12 +25,12 @@ all worktrees of the repo share and git never cleans.
 # Ledger — <goal in one line> — <date>
 
 Source: <tickets | plan path | user's list>
-Grant: merge | stop-at-ready · may decide: <reviewer, models, order, escalation to <models>>
+Grant: merge | stop-at-ready · may decide: <reviewer, models, order> · escalation: <no | models>
 Workers: coders=<n> · coder=<model/effort> · reviewer=<model/effort> · tool=<name>
 
 | Task | State | Owner | Branch / PR | Round | Wake | Next |
 | --- | --- | --- | --- | --- | --- | --- |
-| logs-follow-stop | reviewing | coder a1f3 · reviewer 9c2e | fix/logs-follow-stop · #291 | 1 | reviewer finish notice | triage findings |
+| <task> | <state> | <coder id> · <reviewer id> | <branch> · #<pr> | <round> | <wake> | <next> |
 
 ## Rulings
 - R1: <what you decided> — <why> — <cost if wrong>
@@ -74,12 +74,14 @@ Many workers start with none of your history, so the first brief stands on its o
 Aim for this density. The structure is yours to choose.
 
 ```text
-Fix #42 (https://github.com/o/r/issues/42): `logs --follow` should stop when the task needs a
-human. Done = a test that follows a task into needs_input passes, and the command exits 0 there.
-Work in ../r.worktrees/fix/logs-follow-stop (from origin/main). I believe the stop signal already
-exists as a `needs_input` event; check before adding one. #57 owns the wake hook, so leave
-src/hooks/ alone. Draft PR following the repo's PR template (or a PR-writing skill such as `write-pr`, if installed); merge origin/main in before you report. Write the full
-report to <run>/reports/logs-follow-stop.md and reply in the usual short shape.
+Fix #42 (https://github.com/o/r/issues/42): `export --since` ignores the time zone and drops the
+last hour of data. Done = a test that exports across a UTC offset passes, and the row count
+matches the source. Work on branch fix/export-since-tz in ../r.worktrees/fix/export-since-tz (from
+origin/main). I believe the parser already returns a zone-aware time; check before adding one.
+#57 owns the date utilities, so leave src/dates/ alone. Open the PR following the repo's PR
+template (or a PR-writing skill such as `write-pr`, if installed); merge origin/main in before you
+report. Run long checks in the foreground. Write the full report to
+<run>/reports/export-since-tz.md and reply in the usual short shape.
 ```
 
 ## Report
