@@ -80,7 +80,9 @@ This skill replaces two lines of T3's orchestration instructions:
 Where it bites:
 
 - A follow-up runs on the model of the child's previous run. To move a task to a stronger model,
-  start a new `delegate_task` whose brief points at the report file.
+  start a new `delegate_task` whose brief points at the report file. T3 never switches a model or
+  provider unasked, so escalate only when the Intake grant names the target model and
+  `providerInstanceId`; otherwise ask the user first.
 - Use `watch_pull_request` for waiting on CI. Run `scripts/pr-ci.sh` without `--wait` when you want
   the verdict in one line.
 - Several provider profiles can offer the same model. `orchestrator_capabilities` lists each as a
