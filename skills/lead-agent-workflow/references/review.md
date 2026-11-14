@@ -70,9 +70,9 @@ the cause before sending another round:
 - **The brief or the spec is unclear,** or coder and reviewer read it differently. Settle it with a
   ruling, or re-brief.
 - **The reviewer raises new nits each round.** Look at what truly blocks, defer the rest, move on.
-- **The coder cannot see its own problem.** If the user allows escalation, move it to a stronger
-  model: change the model on the same agent where the tool can, otherwise start a new coder that
-  reads the report file first.
+- **The coder cannot see its own problem.** Move it to a stronger model; that is your call, within
+  the provider profiles allowed at Intake, recorded as a ruling. Change the model on the same agent
+  where the tool can, otherwise start a new coder that reads the report file first.
 - **The cause is outside the code:** a broken environment or toolchain, missing access, flaky
   infrastructure, or a decision only the user can make. Mark the task `blocked`, leave the PR open,
   record the evidence, and carry on with the other tasks.

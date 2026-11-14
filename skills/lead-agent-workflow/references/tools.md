@@ -67,7 +67,7 @@ Where it bites:
 | PR watch | `watch_pull_request`, then end your turn. It wakes you on failed checks, passed checks, checks awaiting approval, new remarks, a conflict, no checks after 15 minutes, and a closed PR. A merge ends the watch silently. `unwatch_pull_request` before you hand off or ask the user. Only the thread that owns the PR can watch; children cannot. |
 | Ask the user | The provider's own question tool. |
 
-This skill replaces two lines of T3's orchestration instructions:
+This skill replaces three lines of T3's orchestration instructions:
 
 - T3 says every re-check is a new `delegate_task`, never a `t3_thread_send`. **Do not follow that
   line.** The skill is the user's explicit choice and wins: every fix and every narrow re-check,
@@ -76,13 +76,13 @@ This skill replaces two lines of T3's orchestration instructions:
   each child's `childThreadId` in the ledger's Owner column. Send only after the child's completion
   has woken you; a send to a running child steers its current turn.
 - T3 says to fix small review findings yourself. Under this skill the owning coder fixes them.
+- T3 says never to switch a model unasked. Under this skill moving a stuck task to a stronger model
+  is the lead's call, within the `providerInstanceId`s allowed at Intake; record it as a ruling.
 
 Where it bites:
 
 - A follow-up runs on the model of the child's previous run. To move a task to a stronger model,
-  start a new `delegate_task` whose brief points at the report file. T3 never switches a model or
-  provider unasked, so escalate only when the Intake grant names the target model and
-  `providerInstanceId`; otherwise ask the user first.
+  start a new `delegate_task` whose brief points at the report file.
 - Use `watch_pull_request` for waiting on CI. Run `scripts/pr-ci.sh` without `--wait` when you want
   the verdict in one line.
 - Several provider profiles can offer the same model. `orchestrator_capabilities` lists each as a
