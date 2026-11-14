@@ -52,6 +52,8 @@ Where it bites:
   <worktree>` and reset its name, mode and effort with `update_agent`. A Codex reviewer cannot be
   imported this way; start a new one with a delta brief.
 - Not verified: whether sending a prompt to an archived agent revives it.
+- `create_agent` can be refused by the harness's auto-mode check; the same call again goes
+  through. `list_agents` hides a lead's sub-agents; read them with `get_agent_status` by id.
 
 ## T3 Code
 
@@ -65,13 +67,18 @@ Where it bites:
 | PR watch | `watch_pull_request`, then end your turn. It wakes you on failed checks, passed checks, checks awaiting approval, new remarks, a conflict, no checks after 15 minutes, and a closed PR. A merge ends the watch silently. `unwatch_pull_request` before you hand off or ask the user. Only the thread that owns the PR can watch; children cannot. |
 | Ask the user | The provider's own question tool. |
 
-This skill replaces two lines of T3's orchestration instructions:
+This skill replaces three lines of T3's orchestration instructions:
 
-- T3 says every re-check is a new `delegate_task`, never a `t3_thread_send`. Under this skill, a
-  fix or a re-check goes to the same child with `t3_thread_send`, so it keeps its context. Record
+- T3 says every re-check is a new `delegate_task`, never a `t3_thread_send`. **Do not follow that
+  line.** The skill is the user's explicit choice and wins: every fix and every narrow re-check,
+  reviewer included, goes to the same child with `t3_thread_send`, so it keeps its context. A new
+  `delegate_task` is for the cases in `review.md` "Same agent or a new one" only. Record
   each child's `childThreadId` in the ledger's Owner column. Send only after the child's completion
   has woken you; a send to a running child steers its current turn.
 - T3 says to fix small review findings yourself. Under this skill the owning coder fixes them.
+- T3 says never to switch a model unasked. The Intake question on escalation is that ask: with a
+  yes, move a stuck task to one of the models the user named, within the allowed
+  `providerInstanceId`s, without asking again. Without a yes, never switch.
 
 Where it bites:
 
@@ -79,8 +86,21 @@ Where it bites:
   start a new `delegate_task` whose brief points at the report file.
 - Use `watch_pull_request` for waiting on CI. Run `scripts/pr-ci.sh` without `--wait` when you want
   the verdict in one line.
-- Not verified in a live session: that a resumed child recalls its earlier work. On first use,
-  test it once with a small task.
+- Several provider profiles can offer the same model. `orchestrator_capabilities` lists each as a
+  `providerInstanceId`; the user may allow only some. Ask at Intake, record the allowed ids in the
+  ledger, and pass `target.options` accordingly. A task sent to the wrong profile is cancelled
+  before it has a branch.
+- `isolation: "worktree"` names the branch `t3/...`, not the repo's convention. Put the branch name
+  in the brief. A cancelled task leaves its `t3/*` worktree and branch behind; list them in the
+  cleanup at the end.
+- A "completed" notice can be an intermediate turn: the summary says it is still waiting on a
+  command and `hasPendingChildRuns` is true. Treat a notice as a report only when it carries a
+  status and the PR and head SHA match the branch. A "checks passed" notice can belong to an
+  older head; compare the SHA.
+- A child spawns its own sub-agents only when the brief says it may. State that in the brief when a
+  review skill needs it (`review.md`), and forbid it where you do not want it.
+- Not verified in a live session: that a resumed child, a reviewer in particular, recalls its
+  earlier findings. On first use, test it once on a small task and note the result here.
 
 ## Claude Code
 

@@ -72,8 +72,13 @@ Open a run directory and its ledger (`references/contracts.md`), then record:
 
 - the goal in the user's words, and where the work comes from (tickets, a plan, a list);
 - the **grant**: `merge` or `stop-at-ready`, and what you may decide alone (reviewer and model
-  choice, task order, model escalation);
-- whether the user wants a planning pass, how many coders may run at once, which models.
+  choice, task order);
+- whether the user wants a planning pass, how many coders may run at once, which models, and which
+  provider profiles are allowed when a model is offered by more than one;
+- whether you may later move a stuck task to a stronger model, and to which models. Always ask
+  this. With a yes you escalate when the situation calls for it, without asking again; without
+  one you never escalate;
+- when the repo's rules say the user merges, whether the grant `merge` still holds for this run.
 
 Ask only what would change what you do, in one batch, with the harness's question tool. Take the
 rest from "Defaults" and say what you chose.
@@ -141,8 +146,8 @@ Risk decides the review:
 - **High** (state, concurrency, persistence, security, migrations): the strongest reviewer you
   have.
 
-When a review comes back, follow `references/review.md`: triage, fix rounds, re-checks, the round
-cap, and what to do when the loop does not converge.
+When a review comes back, follow `references/review.md`: triage, fix rounds, re-checks, and what
+to do when the loop does not converge.
 
 *Done when no blocking finding is open and every other finding is fixed, deferred or rejected with
 a ruling.*
@@ -225,7 +230,7 @@ the safe path: leave the PR open and put the question first in your report.
 ## Staying cheap
 
 - Resume a worker for work that continues what it knows; its cache and its reasons carry over.
-  `references/review.md` lists the three cases where a new agent is better.
+  `references/review.md` says when a new agent is better, and bounds the fresh review.
 - Name an installed skill (a review skill, a PR-writing skill) in place of a checklist.
 - Read summaries: PR metadata, agent status, the last lines of activity. Read a diff hunk only to
   settle a dispute.

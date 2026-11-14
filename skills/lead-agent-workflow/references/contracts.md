@@ -25,12 +25,12 @@ all worktrees of the repo share and git never cleans.
 # Ledger — <goal in one line> — <date>
 
 Source: <tickets | plan path | user's list>
-Grant: merge | stop-at-ready · may decide: <reviewer, models, order, escalation>
+Grant: merge | stop-at-ready · may decide: <reviewer, models, order, escalation to <models>>
 Workers: coders=<n> · coder=<model/effort> · reviewer=<model/effort> · tool=<name>
 
 | Task | State | Owner | Branch / PR | Round | Wake | Next |
 | --- | --- | --- | --- | --- | --- | --- |
-| logs-follow-stop | reviewing | coder a1f3 · reviewer 9c2e | fix/logs-follow-stop · #291 | 1/3 | reviewer finish notice | triage findings |
+| logs-follow-stop | reviewing | coder a1f3 · reviewer 9c2e | fix/logs-follow-stop · #291 | 1 | reviewer finish notice | triage findings |
 
 ## Rulings
 - R1: <what you decided> — <why> — <cost if wrong>
@@ -57,7 +57,11 @@ Many workers start with none of your history, so the first brief stands on its o
   the user set.
 - **Acceptance criteria:** the checkable conditions that mean done.
 - **Out of scope:** what to leave alone, and which PR owns any shared piece.
-- **Where to work:** the worktree, the branch and the base.
+- **Where to work:** the worktree, the branch and the base. Name the branch yourself when the tool
+  names it differently.
+- **Finish only with the final result.** A coder that ends its turn to wait for a background test
+  command sends a finish notice before it has pushed. Tell it to run long checks in the
+  foreground and to end the turn with the report.
 - **Premises as claims to check:** "I believe X; verify it, and tell me before building on it if it
   is wrong."
 - **Pointers:** ticket, spec section, notes file, earlier commits. Link them; the worker reads what
@@ -98,6 +102,8 @@ worker starts from.
 The brief: use the review skill on PR #N; the ticket or spec it implements; the owner of any shared
 concept; review only, no edits. Add nothing the reviewer can discover on its own, and say nothing
 about what to ignore. If the reviewer's harness has no review skill, name its built-in review.
+Check the repo for its own review skill and name that one; fix the diff base (for example
+`origin/main`); say that sub-agents are allowed when the skill uses them (`review.md`).
 
 Each finding comes back as:
 
@@ -118,6 +124,8 @@ Send the delta, never the history.
   the finding is wrong, and to reply with the commit SHA and one line per finding.
 - **Re-check to the reviewer:** what changed for each finding it raised, the fix range, and one
   question: did the fix break anything in the lines it touched?
+- **Fresh review:** the first-review brief plus the settled list of findings and rulings
+  (`review.md`, "Same agent or a new one").
 - **Rebase:** which merge caused the conflict and which side wins where they overlap. The coder
   pushes with `--force-with-lease`.
 
