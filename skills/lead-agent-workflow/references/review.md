@@ -115,8 +115,6 @@ fix.
 
 Bound it so it cannot restart the loop:
 
-- **One per PR,** after the first review. A second trigger means the task is unstable: re-plan it,
-  or mark it `blocked` and ask the user. Do not review it a third time.
 - **Brief it with the settled list.** The first-review brief, plus a short list from the ledger:
   each earlier finding as its id, one line and its route, and each ruling that touches the PR.
   These are settled. It does not raise them again; if it thinks a ruling is wrong, it says so in
