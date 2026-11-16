@@ -1,8 +1,8 @@
 # agent-skills
 
 Agent skills for running coding work through AI agents: one to lead a team of workers from request
-to merged PR, and one to write the pull request. They work in Claude Code and any harness that
-reads `SKILL.md` skills.
+to merged PR, one to write the pull request, and one to post a review on it. They work in Claude
+Code and any harness that reads `SKILL.md` skills.
 
 ## Skills
 
@@ -10,9 +10,11 @@ reads `SKILL.md` skills.
 | --- | --- | --- |
 | [`lead-agent-workflow`](skills/lead-agent-workflow) | "orchestrate agents to fix these issues", "dispatch coders and reviewers" | One lead agent builds a task graph, dispatches coders and reviewers, runs the review loop, gates merges on CI, and keeps its own context small. |
 | [`write-pr`](skills/write-pr) | "open a PR", "write the PR description" | Writes a short PR that leads with the problem, shows evidence, and states the merge risk. |
+| [`write-review-comment`](skills/write-review-comment) | "post the review on the PR", "comment the findings" | Posts each review round as one PR comment in a fixed format: the verdict first, then every finding with a permalink, the line of code, a failing scenario and a fix. |
 
 `lead-agent-workflow` tells its coders to write PRs with a PR-writing skill. `write-pr` is the one
-meant for that, but any other works.
+meant for that, but any other works. `write-review-comment` uses the same finding shape as the
+lead's review loop, so a reviewer's comment can be triaged as it is.
 
 ## Install
 
