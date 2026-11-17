@@ -22,4 +22,3 @@ Report: @REPORT@
 
 {{REVIEW_SKILL_LANGUAGE_COMMENT_POLICY_AND_REPORT_PATH}}
 Review only; no edits. Stable F IDs, file/line/quoted code, failing scenario, impact and fix. Record exact SHA and unverified limits. Start no subagents unless explicitly authorized.
-

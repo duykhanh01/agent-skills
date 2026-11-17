@@ -26,4 +26,3 @@ Report: @REPORT@
 
 {{EXPECTED_RESULT_EVIDENCE_REPORT_UPDATE_AND_STOP_POINT}}
 Before re-check, confirm queued requests are addressed and pushes settled. Re-check findings and related impact; reopen settled points only with new evidence.
-

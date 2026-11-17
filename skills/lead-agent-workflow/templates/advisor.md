@@ -27,4 +27,3 @@ Report: @REPORT@
 Save each decision before replying: parent-scoped ID, timestamp, question, conclusion, evidence, tradeoffs, scope/status and successor link.
 {{REQUIRED_DECISIONS_AND_STOP_POINT}}
 Reply with IDs, one-sentence conclusion, affected tasks and report path. Start no subagents.
-

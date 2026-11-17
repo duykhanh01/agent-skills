@@ -26,4 +26,3 @@ Report: @REPORT@
 
 {{REPO_CHECKS_BEHAVIOR_EVIDENCE_PR_POLICY_AND_STOP_POINT}}
 Start no subagents or reviewers. Report revision, full head, commands/results and limitations; finish the assigned work before reporting DONE.
-
