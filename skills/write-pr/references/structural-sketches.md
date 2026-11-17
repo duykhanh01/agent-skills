@@ -90,4 +90,3 @@ Use a diff when the shape already exists and the point is what changes. Match th
 Show the full block instead of a sketch when most of it is new, when trimming it would hide ordering
 or ownership, or when the reviewer needs the exact shape, such as a new type, schema, or public
 signature.
-
