@@ -121,7 +121,7 @@ def brief_create(run, task, role):
 
 def brief_check(path):
     content = path.read_text()
-    require(not re.search(r"\{\{.*?\}\}|@[A-Z_]+@|<[^>\n]+>", content), "unfinished placeholder")
+    require(not re.search(r"\{\{[A-Z_]+\}\}|@(TASK|PARENT|ROLE|REPORT)@", content), "unfinished placeholder")
     fields = {}
     for key in ("Task", "Parent", "Role", "Revision", "Report"):
         found = re.findall(rf"^{key}: (.+)$", content, re.M)
@@ -198,8 +198,13 @@ def archive(run, task):
     require(any(r["Task"] == task for r in selected), "parent missing from active tasks")
     for row in selected:
         require(row["Outcome"] in OUTCOMES and row["Block"] == "-", "task or child is still live/blocked")
+        optional_records = row["Phase"] == "tracking" or (
+            row["Phase"] == "queued" and row["Outcome"] in {"cancelled", "superseded"})
         for field in ("Brief", "Report"):
-            require(row[field] != "-" and reference(run, row[field]).is_file(), f"missing {field} record")
+            if row[field] == "-":
+                require(optional_records and row["Next"] != "-", f"missing {field} record or closure explanation")
+            else:
+                require(reference(run, row[field]).is_file(), f"missing {field} record")
     stamp = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
     for row in selected:
         key = row["Task"]
@@ -212,8 +217,10 @@ def archive(run, task):
     atomic(history, content)
     for row in selected:
         key = row["Task"]
+        evidence = row["Next"] if row["Report"] == "-" else (
+            f"[report]({os.path.relpath(reference(run, row['Report']), directory)})")
         record = dict(Task=key, Parent=row["Parent"], Outcome=row["Outcome"], Archived=entries[key][0],
-                      Evidence=f"{row['Head']}; [report]({os.path.relpath(reference(run, row['Report']), directory)})",
+                      Evidence=f"{row['Head']}; {evidence}",
                       History=f"[{key}]({history.name}#{key.lower().replace('.', '')})")
         old = next((r for r in indexed if r["Task"] == key), None)
         require(old is None or old == record, f"index conflicts with ledger: {key}")

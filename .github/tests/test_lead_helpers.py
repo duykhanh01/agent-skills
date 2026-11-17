@@ -93,6 +93,48 @@ class Helpers(unittest.TestCase):
                      ("brief", "create", self.run, "T1", "unknown"), ("archive", self.run), ()]:
             self.assertNotEqual(self.command("task.sh", *args).returncode, 0)
 
+    def test_brief_allows_literal_technical_examples(self):
+        path = self.filled_brief()
+        path.write_text(path.read_text() + '\nRender `<script>` as text, accept `List<T>`, '
+                        'and preserve `{{ customer.name }}` and `{{value}}`.\n')
+        result = self.command("task.sh", "brief", "check", path)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        path.write_text(path.read_text() + '\n{{REPO_CHECKS_BEHAVIOR_EVIDENCE_PR_POLICY_AND_STOP_POINT}}\n')
+        self.assertNotEqual(self.command("task.sh", "brief", "check", path).returncode, 0)
+
+    def test_archive_without_records_before_dispatch_or_for_tracking_parent(self):
+        rows = []
+        for name, phase, outcome, reason in [
+                ("T1", "tracking", "accepted", "Scope closure verified against source criteria"),
+                ("T1.1", "queued", "cancelled", "User removed this task before dispatch"),
+                ("T1.2", "queued", "superseded", "Replaced by the approved revised plan")]:
+            row = {c: "-" for c in task.COLUMNS}
+            row.update(Task=name, Parent=task.parent(name), Phase=phase, Outcome=outcome, Next=reason)
+            rows.append(row)
+        path = self.ledger(rows)
+        # Optional records still cannot name missing files or omit the closure explanation.
+        for field, value in [("Brief", "missing.md"), ("Report", "missing.md"), ("Next", "-")]:
+            invalid = [dict(row) for row in rows]
+            invalid[1][field] = value
+            self.ledger(invalid)
+            self.assertNotEqual(self.command("task.sh", "archive", self.run, "T1.1").returncode, 0)
+        # Once work has started, cancellation must preserve its actual records.
+        invalid = [dict(row) for row in rows]
+        invalid[1]["Phase"] = "coding"
+        self.ledger(invalid)
+        self.assertNotEqual(self.command("task.sh", "archive", self.run, "T1.1").returncode, 0)
+        self.ledger(rows)
+        result = self.command("task.sh", "archive", self.run, "T1")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(task.ledger(path.read_text())[1], [])
+        index = (self.run / "archive/index.md").read_text()
+        for row in rows:
+            self.assertIn(row["Next"], index)
+        self.assertNotIn("[report]", index)
+        repeat = self.command("task.sh", "archive", self.run, "T1")
+        self.assertEqual(repeat.returncode, 0, repeat.stderr)
+        self.assertEqual((self.run / "archive/index.md").read_text(), index)
+
     def test_archive_child_preserves_references_decisions_and_parent(self):
         parent = self.row("T1", "-")
         child = self.row("T1.1")

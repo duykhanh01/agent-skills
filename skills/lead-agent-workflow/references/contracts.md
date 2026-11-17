@@ -32,7 +32,7 @@ Repository: remote, base and verified base checkpoint; CI policy path
 ## Active tasks
 | Task | Parent | Phase | Outcome | Owner | Depends | Head | Reviewed | Brief | Report | Block | Next |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| T4 | - | tracking | - | lead:id | - | - | - | briefs/T4-advisor.md | reports/T4-advisor.md | - | integration criteria; wake |
+| T4 | - | tracking | - | lead:id | - | - | - | - | - | integration criteria source; wake |
 | T4.1 | T4 | coding | - | coder:id; reviewer:id | - | full SHA or - | full SHA or - | briefs/T4.1-coder.md | reports/T4.1-coder.md | - | next action; wake |
 
 ## Decisions
@@ -69,8 +69,10 @@ bash scripts/task.sh brief check <brief-path>
 
 The Bash entry point delegates parsing and atomic writes to [task.py](../scripts/task.py).
 Create writes `briefs/<task>-<role>.md` exclusively, fills Task/Parent/Revision/Report and prints
-only its absolute path. Fill every `{{PLACEHOLDER}}` before checking. The check validates required
-sections, role/ID/revision, absolute report path under an existing directory and required Read paths.
+only its absolute path. Fill every uppercase `{{PLACEHOLDER}}` before checking; this syntax is
+reserved for scaffolds. Literal HTML, generic types and ordinary template expressions are allowed.
+The check validates required sections, role/ID/revision, absolute report path under an existing
+directory and required Read paths.
 Each Read bullet is `- /absolute/file#optional-section — purpose` or an HTTPS URL. Use `- none`
 only if no source reading is necessary. Local files must exist; remote URLs are shape-checked only,
 not fetched. Output report may not exist yet. Templates are scaffolds, not ready dispatches.
@@ -112,6 +114,12 @@ its terminal descendants; archiving a child leaves the parent active and updates
 History groups by root task (`archive/T4.md`), timestamped per task; `archive/index.md` retains
 Task/Parent/Outcome/time/Evidence/History, including full commits or report references. Use Evidence
 from Head and Report; keep PR URLs in the report. Parent completion remains a lead decision.
+
+Tracking parents do not need artificial advisor briefs/reports. Tasks cancelled or superseded while
+still queued may also have never acquired those records. In these cases, Brief/Report may be `-`;
+Next must contain the lead's closure reason or integration result and its evidence references. The
+index preserves this explanation when no report exists. Any declared file must still exist, and
+ordinary completed worker tasks still require their records.
 
 Helper writes history first, index second, ledger last with atomic file replacements and an
 exclusive helper lock. Repeating after interruption reconciles already-written entries without
