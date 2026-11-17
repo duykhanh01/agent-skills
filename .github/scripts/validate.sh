@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Structural checks for every skill under skills/, plus pr-ci.sh verdict logic.
+# Structural checks for every skill, plus offline helper behavior tests.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -18,27 +18,16 @@ for dir in skills/*/; do
   # Paths a skill mentions must exist; every bundled file must be mentioned.
   while read -r path; do
     [[ -e $dir/$path ]] || err "$md mentions missing $path"
-  done < <(grep -rhoE '(references|scripts)/[A-Za-z0-9_.-]+\.(md|sh)' "$dir" | sort -u)
-  for f in "$dir"/references/*.md "$dir"/scripts/*.sh; do
+  done < <(grep -rhoE '(references|scripts|templates)/[A-Za-z0-9_.-]+\.(md|sh|py)' "$dir" --include='*.md' --include='*.sh' --include='*.py' | sort -u)
+  for f in "$dir"/references/*.md "$dir"/templates/*.md "$dir"/scripts/*.sh "$dir"/scripts/*.py; do
     [[ -e $f ]] || continue
-    grep -q "${f#"$dir"/}" "$md" || err "$f is not mentioned in $md"
+    grep -rq "${f#"$dir"/}" "$dir" --include='*.md' --include='*.sh' || err "$f is not referenced by the skill"
   done
 
   grep -q "\`$skill\`" README.md || err "README.md does not list $skill"
 done
 
-# pr-ci.sh classification, offline.
-ci=skills/lead-agent-workflow/scripts/pr-ci.sh
-check() {
-  local want=$1 workflows=$2 json=$3 got
-  got=$(PR_CI_CLASSIFY_ONLY=$workflows bash "$ci" 1 <<<"$json")
-  [[ $got == "$want"* ]] || err "classify($json) = '$got', want '$want'"
-}
-check NO_RUN  1 '[]'
-check PENDING 1 '[{"name":"a","bucket":"pending","workflow":"ci","link":""}]'
-check RED     1 '[{"name":"a","bucket":"fail","workflow":"ci","link":"u"}]'
-check GREEN   1 '[{"name":"a","bucket":"pass","workflow":"ci","link":""}]'
-check NO_RUN  1 '[{"name":"scan","bucket":"pass","workflow":"","link":""}]'
-check GREEN   0 '[{"name":"scan","bucket":"pass","workflow":"","link":""}]'
+# Offline helper behavior; exercises shell entry points without mutating GitHub.
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .github/tests -v || fail=1
 
 exit $fail

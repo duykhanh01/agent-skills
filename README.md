@@ -28,7 +28,9 @@ Copy only the folders you want. Each skill is self-contained.
 
 ## Requirements
 
-- An authenticated [GitHub CLI](https://cli.github.com) (`gh`) and `jq`.
+- An authenticated [GitHub CLI](https://cli.github.com) (`gh`) and `jq`. Brief/archive helpers also use Python 3 (standard library, Unix).
+- `pr-ci.sh` takes `--policy <json-file>` naming expected checks and explicitly allowed skips;
+  see the lead skill’s [CI policy contract](skills/lead-agent-workflow/references/supervision.md#ci-verdicts).
 - `lead-agent-workflow` needs a harness that can spawn, resume and wait on worker agents. Cards for
   Paseo, T3 Code and Claude Code are in its `references/tools.md`.
 
