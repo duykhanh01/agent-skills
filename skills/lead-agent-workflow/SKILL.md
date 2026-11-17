@@ -23,6 +23,10 @@ an explicit integration branch and a final whole-branch review.
 
 ## Intake and preflight
 
+Resolve this skill's installed directory from the `SKILL.md` location and use absolute paths for
+its helpers, regardless of the worker's current directory. In command examples, `/absolute/skill-dir`
+means that installed directory, not the target repository root.
+
 Read the request, repository rules and existing grants first. Record goal/source, `merge` or
 `stop-at-ready`, permitted providers/profiles/models/effort, escalation authority and the total
 agent limit. Ask once, in one batch, only for missing choices that affect execution. Preserve prior

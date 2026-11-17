@@ -32,8 +32,8 @@ Repository: remote, base and verified base checkpoint; CI policy path
 ## Active tasks
 | Task | Parent | Phase | Outcome | Owner | Depends | Head | Reviewed | Brief | Report | Block | Next |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| T4 | - | tracking | - | lead:id | - | - | - | - | - | integration criteria source; wake |
-| T4.1 | T4 | coding | - | coder:id; reviewer:id | - | full SHA or - | full SHA or - | briefs/T4.1-coder.md | reports/T4.1-coder.md | - | next action; wake |
+| T4 | - | tracking | - | lead:id | - | - | - | - | - | - | integration criteria source; wake |
+| T4.1 | T4 | coding | - | coder:id; reviewer:id | - | - | - | briefs/T4.1-coder.md | reports/T4.1-coder.md | - | next action; wake |
 
 ## Decisions
 - T4-D1: active; reports/T4-advisor.md; applies to T4.1 and T5
@@ -63,8 +63,8 @@ Use the role template: [coder](../templates/coder.md), [reviewer](../templates/r
 [advisor](../templates/advisor.md), or [follow-up](../templates/follow-up.md).
 
 ```bash
-bash scripts/task.sh brief create <run-dir> <task-id> <coder|reviewer|advisor|follow-up>
-bash scripts/task.sh brief check <brief-path>
+bash /absolute/skill-dir/scripts/task.sh brief create <run-dir> <task-id> <coder|reviewer|advisor|follow-up>
+bash /absolute/skill-dir/scripts/task.sh brief check <brief-path>
 ```
 
 The Bash entry point delegates parsing and atomic writes to [task.py](../scripts/task.py).
@@ -105,7 +105,7 @@ Reconcile live state before acting, including work left by disappeared agents.
 ## Archive protocol
 
 ```bash
-bash scripts/task.sh archive <run-dir> <task-id>
+bash /absolute/skill-dir/scripts/task.sh archive <run-dir> <task-id>
 ```
 
 Lead marks terminal outcomes and confirms decision references/deferred tracking first. Helper

@@ -21,16 +21,19 @@ Write the comment in English, unless the repo's own rules name another language.
 - **Carry the findings over unchanged.** Do not add, drop, merge or soften findings while
   formatting. A finding that lacks a line of code or a failing scenario is not ready: get the
   evidence, or move it to "Not covered" as something you suspected and could not confirm.
-- **Collect the facts the format needs:** the PR number, the base, the full head SHA
-  (`gh pr view <number> --json headRefOid,baseRefName`) and the repo
-  (`gh repo view --json nameWithOwner`).
-- **Look for earlier review comments** on the PR (see "Posting"). They give you the round number,
-  the ids already used, and whether this head was already reviewed.
+- **Use the commit actually reviewed.** Capture the PR number, base and full head SHA before
+  reviewing (`gh pr view <number> --json headRefOid,baseRefName`), and read that commit's diff and
+  source. Get the repo with `gh repo view --json nameWithOwner`. A formatting-only handoff must
+  supply the reviewed SHA; querying the current head cannot establish what was reviewed.
+- **Look for earlier review comments** on the PR (see "Posting"). Reuse the review ID for its
+  follow-up rounds; assign a new unique ID to an independent review, even at the same head.
+  Keep the ID across replacement reviewers. Read existing finding IDs before allocating new ones;
+  parallel reviewers must coordinate allocation with the lead to avoid collisions.
 
 ## First review
 
 ```markdown
-<!-- review-comment round=1 head=<full head SHA> -->
+<!-- review-comment review=<review-id> round=1 head=<full reviewed SHA> -->
 ## Review: <Changes needed | No blocking findings> · <n> blocking, <m> not blocking
 
 Reviewed `<base>...<head SHA, 7 chars>` · round 1 · <reviewer: model or agent name>
@@ -71,9 +74,11 @@ Fix: compute `total` from the order lines inside `charge()` instead of mutating 
 
 - **The first visible line is the verdict.** "Changes needed" when at least one finding is
   blocking, otherwise "No blocking findings". The counts match the sections below.
-- **Blocking** means a defect this change introduces that must be fixed before merge. Everything
-  else is not blocking: defects in code that was already there, rare cases, small costs,
-  suggestions. Do not invent further severity levels.
+- **Blocking** means a defect this change introduces that must be fixed before merge. Judge
+  impact, likelihood and the source requirements together: a rare data-loss, money or security
+  failure can still block. Existing unrelated defects, accepted small costs and suggestions are
+  not blocking. Do not invent further severity levels or change the reviewer's classification
+  merely to fit this format.
 - **Ids are `F1`, `F2`, … in one sequence** across both sections, blocking first, most severe
   first within a section. An id never changes and is never reused on the same PR.
 - **Each finding has all four parts:** location, quoted line, "Fails when", "Fix".
@@ -101,10 +106,10 @@ Fix: compute `total` from the order lines inside `charge()` instead of mutating 
 ## Re-check after fixes
 
 A re-check is a new comment, so the PR timeline shows which commits each round looked at. Reuse
-the ids of the earlier rounds.
+the ids of the earlier rounds and the same review ID; increment the round for a new re-check.
 
 ```markdown
-<!-- review-comment round=<n> head=<full head SHA> -->
+<!-- review-comment review=<review-id> round=<n> head=<full reviewed SHA> -->
 ## Re-check: <Changes needed | No blocking findings> · <n> open
 
 Reviewed `<previous head SHA>..<new head SHA>` · round <n> · <reviewer>
@@ -113,7 +118,7 @@ Reviewed `<previous head SHA>..<new head SHA>` · round <n> · <reviewer>
 - **F2** NOT ADDRESSED: <what still fails, in one line>
 - **F3** NOT ADDRESSED (not blocking)
 
-### New in the fixed lines
+### New findings from the fix
 
 **F4** · [`<file>:<line>`](<permalink>) · <the defect in one line>
 > `<the line of code it is about>`
@@ -127,9 +132,10 @@ Fix: <what to change>.
 ```
 
 - List every finding that was still open after the previous round, one line each.
-- New findings continue the numbering and come only from the lines the fix touched. Say whether
-  each is blocking by adding `(not blocking)` after its title; without it, it is blocking. Leave
-  the section out when there are none.
+- New findings continue the numbering and cover the fix and affected execution paths, including
+  unchanged callers. Show how the fix causes the failure; unrelated pre-existing defects do not
+  expand the re-check. Say whether each is blocking by adding `(not blocking)` after its title;
+  without it, it is blocking. Leave the section out when there are none.
 - "Open" in the verdict line counts blocking findings that are not addressed, old and new.
 
 ## Posting
@@ -141,11 +147,18 @@ gh pr view <number> --json comments \
   --jq '.comments[] | select(.body | startswith("<!-- review-comment")) | {url, marker: (.body | split("\n")[0])}'
 ```
 
-- **No comment for this head SHA:** write the comment to a file and post it once with
-  `gh pr comment <number> --body-file <file>`.
-- **A comment for this head SHA already exists** (a retried or repeated run): do not post a second
-  one. Replace its body: take the numeric id from the end of its URL and run
+- **Verify the head before posting.** Read `headRefOid` again and compare it with the full
+  reviewed SHA. If it changed, keep the original SHA and review the additional changes before
+  publishing a current-head verdict. Never relabel an old review with the new SHA. A later push
+  makes the comment historical; merge gates must compare its marker with the current head.
+- **One comment per review ID, round and reviewed SHA:** write the comment to a file and post it
+  once with `gh pr comment <number> --body-file <file>` when that exact marker does not exist.
+- **Retry of that exact review ID, round and SHA:** update only its recorded comment URL after
+  checking the marker. Take the numeric id from the end of its URL and run
   `gh api -X PATCH repos/<owner>/<repo>/issues/comments/<id> -F body=@<file>`.
+  A matching head alone never permits overwriting another review. Older markers without a review
+  ID remain history; update one only when the caller explicitly identifies that comment as the
+  retry target. A new re-check round gets a new comment even if its head is unchanged.
 - **Post a plain comment, not a review.** `gh pr review --request-changes` fails when the reviewer
   uses the same account as the PR author, which is the usual case for agents.
 - **Fall back to REST when GraphQL is rate-limited:**

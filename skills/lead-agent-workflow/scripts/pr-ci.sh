@@ -32,7 +32,9 @@ classify() {
     elif any(.[]; (.name | type != "string" or length == 0) or
                    (.bucket | IN("pass", "fail", "pending", "cancel", "skipping") | not))
       then error("invalid check record")
-    elif (map(.name) | length != (unique | length)) then error("ambiguous check names")
+    elif (map(.name) | length != (unique | length)) then error("ambiguous check names: " +
+      ([group_by(.name)[] | select(length > 1) | .[] |
+        "\(.name) source=\(.source // "unknown") app=\(.app_id // "unknown") id=\(.check_id // "unknown") \(.link // "")"] | join(" | ")))
     elif any(.[]; .bucket == "fail" or .bucket == "cancel") then
       "RED " + ([.[] | select(.bucket == "fail" or .bucket == "cancel") |
         "\(.name)=\(.bucket) \(.link // "")"] | join(" | "))
@@ -69,7 +71,7 @@ verdict() {
   [[ $(jq -r .mergeable <<<"$info") == CONFLICTING ]] && { echo "DIRTY head=$sha"; return; }
   [[ $(jq -r .mergeable <<<"$info") == UNKNOWN ]] && { echo "PENDING mergeability head=$sha"; return; }
   # REST failures remain errors. Paginate so an external status cannot hide beyond the first page.
-  runs=$(gh api --paginate --slurp "repos/{owner}/{repo}/commits/$sha/check-runs?per_page=100") || {
+  runs=$(gh api --paginate --slurp "repos/{owner}/{repo}/commits/$sha/check-runs?filter=latest&per_page=100") || {
     echo "ERROR check-runs query head=$sha"; return;
   }
   statuses=$(gh api --paginate --slurp "repos/{owner}/{repo}/commits/$sha/status?per_page=100") || {
@@ -80,7 +82,7 @@ verdict() {
        ($statuses | type != "array" or length == 0 or any(.[]; .statuses | type != "array")) then
       error("invalid API response") else
     [ $runs[].check_runs[] |
-      {name: .name, link: .html_url,
+      {name: .name, link: .html_url, source: "check-run", app_id: .app.id, check_id: .id,
        bucket: (if .status != "completed" then
                   if (.status | IN("queued", "in_progress", "waiting", "pending", "requested")) then "pending"
                   else "unknown" end
@@ -90,7 +92,7 @@ verdict() {
                 elif (.conclusion | IN("failure", "timed_out", "action_required", "startup_failure", "stale")) then "fail"
                 else "unknown" end)} ] +
     [ $statuses[].statuses[] |
-      {name: .context, link: .target_url,
+      {name: .context, link: .target_url, source: "commit-status",
        bucket: (if .state == "success" then "pass" elif .state == "pending" then "pending"
                 elif (.state | IN("failure", "error")) then "fail" else "unknown" end)} ] end') || {
     echo "ERROR malformed checks head=$sha"; return;

@@ -25,7 +25,7 @@ to use them. Preserve uncommitted/untracked work before reconstruction or cleanu
 Use one authoritative classification, including external statuses:
 
 ```bash
-bash scripts/pr-ci.sh <pr> --policy /absolute/run/ci-policy.json
+bash /absolute/skill-dir/scripts/pr-ci.sh <pr> --policy /absolute/run/ci-policy.json
 ```
 
 Policy is a reviewed run artifact based on required checks, existing workflows, path/draft rules
@@ -41,6 +41,14 @@ change (for example docs-only jobs behind an always-present aggregate gate). Nev
 context by calling it skipped. Include required and relevant nonrequired jobs and external contexts;
 all observed failures/cancellations veto green even if absent from expected. Resolve ambiguous or
 duplicate context names before using the helper. Do not change the policy to hide a failure.
+
+The helper requests `filter=latest` check runs and GitHub's combined current status for the exact
+head. If names still collide, it returns ERROR with source, app ID, check-run ID and link where
+available. Inspect those records on that SHA: distinguish reruns from separate apps or jobs. Never
+choose a passing record merely because it is newer or remove a failing app. Rename colliding job
+names at their source when authorized, then rerun and update the reviewed policy to those names.
+If the sources cannot be distinguished or changed within scope, record the blocker and hand back;
+this helper cannot establish GREEN from ambiguous names.
 
 | Verdict | Action |
 | --- | --- |

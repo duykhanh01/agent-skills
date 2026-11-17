@@ -276,6 +276,30 @@ class Helpers(unittest.TestCase):
         self.assertTrue(result.stdout.startswith("GREEN"), result.stdout)
         self.assertTrue(self.classify([dict(name="build", bucket="pass")]).stdout.startswith("NO_RUN"))
 
+    def test_ci_duplicate_names_preserve_app_identity_and_never_choose_green(self):
+        runs = [dict(id=101, app=dict(id=11), name="build", status="completed",
+                     conclusion="failure", html_url="https://checks/101"),
+                dict(id=202, app=dict(id=22), name="build", status="completed",
+                     conclusion="success", html_url="https://checks/202")]
+        for records in [runs, list(reversed(runs))]:
+            with self.subTest(records=records):
+                result = self.command("pr-ci.sh", "1", "--policy", self.policy,
+                                      env=self.mock_github(runs=records))
+                self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
+                for detail in ["ambiguous check names", "source=check-run", "app=11",
+                               "app=22", "id=101", "id=202", "https://checks/101", "https://checks/202"]:
+                    self.assertIn(detail, result.stderr)
+                self.assertNotIn("GREEN", result.stdout)
+                queries = (self.run / "queries").read_text()
+                self.assertIn(f"commits/{SHA}/check-runs?filter=latest&per_page=100", queries)
+
+    def test_ci_check_run_and_commit_status_collision_is_not_green(self):
+        env = self.mock_github(statuses=[dict(context="build", state="success", target_url="status")])
+        result = self.command("pr-ci.sh", "1", "--policy", self.policy, env=env)
+        self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
+        self.assertIn("source=check-run", result.stderr)
+        self.assertIn("source=commit-status", result.stderr)
+
     def test_ci_malformed_and_ambiguous_evidence_is_error(self):
         for checks in [{}, [dict(name="build", bucket="unknown")], [dict(bucket="pass")],
                        [dict(name="build", bucket="pass"), dict(name="build", bucket="pass")]]:
@@ -302,6 +326,7 @@ if sys.argv[1:3] == ['pr', 'view']:
     if s['error'] == 'info' or (n and s['error'] == 'after'): sys.exit(1)
     print(json.dumps(dict(state=s['state'], isDraft=s['isDraft'], mergeable=s['mergeable'], headRefOid=s['head'] if not n else s['after_head'])))
 elif sys.argv[1] == 'api':
+    with (p / 'queries').open('a') as log: log.write(sys.argv[-1] + chr(10))
     which = 'runs' if 'check-runs?' in sys.argv[-1] else 'statuses'
     if s['error'] == which: sys.exit(1)
     if s['raw']: print('{}')
