@@ -12,8 +12,12 @@ well, not which headings it has. Write in the language the repo's template and h
 
 ## Before writing
 
-- **Check for an existing PR.** Run `gh pr view <branch>` first. If the branch already has a PR,
-  update it with `gh pr edit`; never open a second one for the same branch.
+- **Check for an existing open PR.** Determine the target repo, head owner/branch and base, then
+  query `gh pr list --repo <owner/repo> --state open --head <head-branch> --base <base> --json number,url,headRepositoryOwner,headRepository`.
+  Verify the head repository for fork PRs. Update a matching open PR with `gh pr edit`; do not
+  duplicate it. A successful empty query means no open match; an authentication, network or quota
+  error does not. Resolve the error (or use REST) before creating. Closed or merged PRs do not
+  prevent a new PR for later work on the branch; multiple matches need clarification.
 - **Write from the diff, not from memory.** Read `git diff <base>...HEAD` and check it against the
   goal. After several rounds of fixes, describe what the diff contains now, not what you remember
   doing.
@@ -39,17 +43,22 @@ well, not which headings it has. Write in the language the repo's template and h
   the PR is wrong.
 - **Be brief.** Skip preambles. Use the project's own vocabulary, including its glossary if it has one.
 - **Keep it accurate.** When later commits change the scope, update the title and description too.
-- **List follow-ups at the end.** Put deferred work, such as review findings left for later, under a
-  final "Follow-ups" heading as a checklist, one item per line. Update it on every new round of
-  fixes: tick or drop what was done, add what was deferred.
+- **Keep follow-ups current.** List deferred work, such as review findings left for later, as a
+  checklist in the template's appropriate section. The template controls headings; add a final
+  "Follow-ups" heading only when no template exists. Update it on every fix round: tick or drop
+  what was done, add what was deferred.
 
 ## Filing
 
-- **Draft or ready is the caller's choice.** If nobody says, open it ready so checks and bots run.
-- **Fall back to REST when GraphQL is rate-limited.** Agents sharing one `gh` account often exhaust
-  the GraphQL quota, which breaks `gh pr create`. Create the PR through REST instead:
-  `gh api repos/<owner>/<repo>/pulls -f title=... -f head=<branch> -f base=<base> -F body=@<file>`.
-  Use `gh api -X PATCH repos/<owner>/<repo>/pulls/<number>` the same way to update one.
+- **Follow the caller's and repository's draft policy.** If neither specifies one, open ready so
+  checks and bots run. Write multiline descriptions to a file and use `--body-file` with `gh`.
+- **Fall back to REST when GraphQL is rate-limited.** Preserve the selected repository, head
+  (including fork owner), base, title, body and draft state. For a draft, use:
+  `gh api repos/<owner>/<repo>/pulls -f title=... -f head=<head> -f base=<base> -F body=@<file> -F draft=true`.
+  Use `-F draft=false` only when ready was selected. For an ambiguous create error, query open PRs
+  again before retrying; the server may already have created it. Use
+  `gh api -X PATCH repos/<owner>/<repo>/pulls/<number> -F body=@<file>` to update the body; that
+  operation preserves draft state. Change draft/ready only through the explicit lifecycle operation.
 
 ## Sketching structural changes
 
@@ -75,96 +84,10 @@ boundaries that point needs. Use the names from the code.
 | States and transitions | Mermaid `stateDiagram-v2` |
 | What changes, when the shape already exists | A `diff` of one of the above |
 
-### Pseudocode
-
-```text
-on save
-  if content is unchanged
-    return cached result
-  write new content
-  return fresh result
-```
-
-### Call tree
-
-```text
-handleRequest
-  authenticate
-  loadOrder
-    readCache
-    readDatabase       # on cache miss
-  renderResponse
-```
-
-### File tree
-
-```text
-src/
-├── cli/        # parses commands
-├── service/    # owns business rules
-└── storage/    # reads and writes records
-```
-
-### Mermaid
-
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant S as Server
-    participant Q as Queue
-    C->>S: submit job
-    S->>Q: enqueue
-    S-->>C: job id
-```
-
-```mermaid
-stateDiagram-v2
-    [*] --> Pending
-    Pending --> Running
-    Running --> Waiting: needs input
-    Waiting --> Running: input received
-    Running --> Done
-    Running --> Failed
-```
-
-### Diff of a sketch
-
-Use a diff when the shape already exists and the point is what changes. Match the diff to the form.
-
-```diff
- handleRequest
-   authenticate
-+  checkRateLimit
-   loadOrder
-   renderResponse
-+    recordMetrics
-```
-
-```diff
- src/
- ├── cli/
- ├── service/
--└── storage.ts
-+└── storage/
-+    ├── reader.ts
-+    └── writer.ts
-```
-
-```diff
- on save
--  write content
-+  if content is unchanged
-+    return cached result
-+  write new content
-```
-
-### Showing code in full
-
-Show the full block instead of a sketch when most of it is new, when trimming it would hide ordering
-or ownership, or when the reviewer needs the exact shape, such as a new type, schema, or public
-signature.
+Read [structural-sketches.md](references/structural-sketches.md) when you need an example of the
+selected form or guidance on showing a code block in full.
 
 ## Credits
 
 Adapted from Matt Pocock's `pr` skill and Theo Browne's `file-pr` skill. The catalogue of sketches
-comes from Dex Horthy's `show-me` skill (HumanLayer). See [NOTICE.md](../../NOTICE.md).
+comes from Dex Horthy's `show-me` skill (HumanLayer). See the bundled [NOTICE.md](NOTICE.md).
