@@ -16,6 +16,10 @@ Code and any harness that reads `SKILL.md` skills.
 meant for that, but any other works. `write-review-comment` uses the same finding shape as the
 lead's review loop, so a reviewer's comment can be triaged as it is.
 
+The lead workflow uses versioned Markdown briefs, a compact ledger for parent and child tasks,
+and an archive helper that preserves reports and decision links. An optional advisor provides
+advice or makes decisions within a scope explicitly delegated by the user.
+
 ## Install
 
 ```bash
