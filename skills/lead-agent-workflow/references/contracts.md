@@ -32,8 +32,8 @@ Repository: remote, base and verified base checkpoint; CI policy path
 ## Active tasks
 | Task | Parent | Phase | Outcome | Owner | Depends | Head | Reviewed | Brief | Report | Block | Next |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| T4 | - | tracking | - | lead:id | - | - | - | - | - | integration criteria source; wake |
-| T4.1 | T4 | coding | - | coder:id; reviewer:id | - | full SHA or - | full SHA or - | briefs/T4.1-coder.md | reports/T4.1-coder.md | - | next action; wake |
+| T4 | - | tracking | - | lead:id | - | - | - | - | - | - | integration criteria source; wake |
+| T4.1 | T4 | coding | - | coder:id; reviewer:id | - | - | - | briefs/T4.1-coder.md | reports/T4.1-coder.md | - | next action; wake |
 
 ## Decisions
 - T4-D1: active; reports/T4-advisor.md; applies to T4.1 and T5
@@ -95,7 +95,7 @@ unverified limits and next step. Keep relevant history below this summary.
 Coder: behavior, validation evidence at the named commit, one answer per finding, queued requests
 still open. Reviewer: exact reviewed SHA, stable F IDs, quoted code/file/line, concrete scenario,
 impact, route and resolution evidence. Advisor: decision records per [advisor.md](advisor.md).
-Scout: ranked evidence/reproductions and uncovered areas in notes; no invented timing minimum.
+Investigation tasks: ranked evidence/reproductions and uncovered areas in notes.
 Reply concisely with status, PR/head or decision IDs, conclusion and report path.
 
 Replacement workers read current brief and report summary first; follow links only as needed. A
